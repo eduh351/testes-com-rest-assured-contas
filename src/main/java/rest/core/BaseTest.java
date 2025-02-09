@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.http.ContentType;
 
 // Essa classe ira ser iniciada antes de todos os testes
 public class BaseTest implements Constantes {
@@ -13,15 +14,15 @@ public class BaseTest implements Constantes {
 	@BeforeClass
 	public static void setup() {
 		
-		System.out.println("Passou aqui");
-		
 		// sempre ira iniciar com a URL Base que foi definida na classe Constantes
 		RestAssured.baseURI = BASE_URL;
 		
 		// Indica que todas as requisções estaram implicitamente sendo enviadas com o formato json
 		RequestSpecBuilder recBuilder = new RequestSpecBuilder();
-		recBuilder.setAccept(CONTENT_TYPE);
+		recBuilder.setContentType(APP_CONTENT_TYPE);
 		RestAssured.requestSpecification = recBuilder.build();
+		
+	
 		
 		// Define o tempo máximo de resposta de acordo com o configurado na classe Constantes
 		ResponseSpecBuilder  resBuilder = new ResponseSpecBuilder();
