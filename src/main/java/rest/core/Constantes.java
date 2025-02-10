@@ -8,6 +8,7 @@ public interface Constantes {
 	String BASE_URL = "http://barrigarest.wcaquino.me";
 	
 	// tipo de requisição que a API trabalha 
+
 	ContentType APP_CONTENT_TYPE = ContentType.JSON;
 	
 	// Tempo máximo  de resposta para cada requisição 

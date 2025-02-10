@@ -6,7 +6,7 @@ import org.junit.BeforeClass;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.http.ContentType;
+
 
 // Essa classe ira ser iniciada antes de todos os testes
 public class BaseTest implements Constantes {
@@ -23,7 +23,6 @@ public class BaseTest implements Constantes {
 		RestAssured.requestSpecification = recBuilder.build();
 		
 	
-		
 		// Define o tempo máximo de resposta de acordo com o configurado na classe Constantes
 		ResponseSpecBuilder  resBuilder = new ResponseSpecBuilder();
 		resBuilder.expectResponseTime(Matchers.lessThan(MAX_TIMEOUT));
