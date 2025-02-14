@@ -1,15 +1,13 @@
 package rest.test;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
-import io.restassured.response.Response;
 import rest.core.BaseTest;
 
 public class Gedave extends BaseTest{  // Classe Cenários foi extendida á classe BaseTest
@@ -26,11 +24,11 @@ public class Gedave extends BaseTest{  // Classe Cenários foi extendida á clas
 			.body(login)
 		
 		.when()
-			.post("https://gedave-proxydev.agricultura.sp.gov.br/usuarios/login")
+			.post("https://gedave-proxydev.agricultura.sp.gov.br/usuarios/login") // URL para efetuar o Login
 		
 		.then()
 			.statusCode(200)
-			.extract().response().asString();
+			.extract().response().asString(); // Extrai o token em forma de String 
 		
 		;
 		
@@ -38,12 +36,12 @@ public class Gedave extends BaseTest{  // Classe Cenários foi extendida á clas
 			.header("Authorization", "Bearer " + token)
 			
 		.when()
-			.get("https://gedave-proxydev.agricultura.sp.gov.br/pessoas-fisica/filtros/avancada?idSituacao=101")
+			.get("https://gedave-proxydev.agricultura.sp.gov.br/pessoas-fisica/filtros/avancada?idSituacao=101") // Busca pela sutuação Ativo
 
 		.then()
-			.statusCode(200)
-			.body("content.nome", hasItem(" teste tetetet"))
-			.body("content.nome", hasItems("Administrador Cda 1 Equideo Robot", "Administrador 1 Cda Vegetal Robot"))
+			.statusCode(200) 
+			.body("content.nome", hasItem(" teste tetetet")) // Verifica que tem um ítem na listagem com o nome teste tetetet
+			.body("content.nome", hasItems("Administrador Cda 1 Equideo Robot", "Administrador 1 Cda Vegetal Robot")) // Verifica que tem os ítens na listagem Administrador Cda 1 Equideo Robot e Administrador 1 Cda Vegetal Robot
 		
 	;
 

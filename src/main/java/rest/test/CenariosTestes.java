@@ -1,18 +1,37 @@
 package rest.test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import io.restassured.response.Response;
 import rest.core.BaseTest;
 
 public class CenariosTestes extends BaseTest{  // Classe Cenários foi extendida á classe BaseTest
+	
+	private String token; // Declarando a variável token como global para poder ser ultilizada em todos os testes
+	
+	@Before
+	public void login() {
+				//.body("{\"email\", \"eduardo@teste\"}, {\"senha\", \"@teste\"}")  // Outra forma de enviar os dados , agora pelo própio body
+				Map<String, String> login = new HashMap<>(); // Usando o Map para armazenar chave e valor que serão enviados no body 
+				login.put("email","edu@testerest.com.br"); // atravez da variável login que foi criada com o Map é possível passar email e senha 
+				login.put("senha","123456");
+				
+				token = given()  // Armazema o tokem após realizar o login na variável token 
+					//.contentType(ContentType.JSON)
+				 	.body(login)        //  Enviando os dados de login no body passando a varível login
+				.when()
+					.post("/signin")    // Rota para fazer o login 
+				.then()
+					.statusCode(200)  // verifica o status da requisição 
+					.extract().path("token");  // Extrai o token após realizar o login
+	}
+	
 	@Test
 	public void naoDevoAcessarAPISemToken() { // Cenário que tenta acessar a rota contas sem estar autenticado na API
 		 given()
@@ -27,75 +46,74 @@ public class CenariosTestes extends BaseTest{  // Classe Cenários foi extendida
 	
 	@Test
 	public void incluirContaComSucesso() { // Cenário para incluir uma nova conta 
-		//.body("{\"email\", \"eduardo@teste\"}, {\"senha\", \"@teste\"}")  // Outra forma de enviar os dados , agora pelo própio body
-		Map<String, String> login = new HashMap<>(); // Usando o Map para armazenar chave e valor que serão enviados no body 
-		login.put("email","edu@testerest.com.br"); // atravez da variável login que foi criada com o Map é possível passar email e senha 
-		login.put("senha","123456");
-		
-		 String token = given()  // Armazema o tokem após realizar o login na variável token 
-			//.contentType(ContentType.JSON)
-		 	.body(login)        //  Enviando os dados de login no body passando a varível login
-		.when()
-			.post("/signin")    // Rota para fazer o login 
-		.then()
-			.statusCode(200)  // verifica o status da requisição 
-			.extract().path("token");  // Extrai o token após realizar o login
 			
 		given()
 			.header("Authorization", "JWT " + token) // Envia o token que f0i extraído
-			.body("{\"nome\":\"Sexta Conta\"}")  // Envia o nome da conta que será criada 
+			.body("{\"nome\":\"Sétima Conta\"}")  // Envia o nome da conta que será criada 
 		.when()
 			.post("/contas")                        // Rota para fazer o post 
 		.then()
-			.log().all()
 			.statusCode(201)                       //  Verifica que a resposta da requisição , conta criada com sucesso 201 Created
-	
 			
 		;
 		
 	}
 	
-
 	@Test
-	public void consultaPessoa() {
-		Map<String, String> login = new HashMap<String, String>();
-		login.put("usuario", "85496485401");
-		login.put("senha", "teste@123");
+	public void alterandoContaComSucesso() {        // Cenário para alterar uma conta 
 		
-		String token = given()
-			.log().all()
-			.body(login)
-		
+		given()
+			.header("Authorization", "JWT " + token) // Envia o token que f0i extraído
+			.body("{\"nome\":\"Conta Alterada de novo\"}")  // Envia o nome da conta que será criada 
 		.when()
-			.post("https://gedave-proxydev.agricultura.sp.gov.br/usuarios/login")
-		
+			.put("/contas/2381880")                 // Rota para fazer o post 
 		.then()
-			.log().all()
-			.statusCode(200)
-			.extract().response().asString();
-			System.out.println("token capturado" + token);
+			.statusCode(200)                       //  Verifica que a resposta da requisição , conta criada com sucesso 200
+			.body("nome", is("Conta Alterada de novo")) // verifica o nome da conta que foi alterada
 		;
 		
-		Response response = given()
-			.log().all()
-			.header("Authorization", "Bearer " + token)
-			
-		.when()
-			.get("https://gedave-proxydev.agricultura.sp.gov.br/pessoas-fisica/filtros/avancada?idSituacao=101")
-
-		.then()
-			.log().all()
-			.statusCode(200)
-			.extract()
-            .response();
-		
-		 given();
-         	response.andReturn()
-         .then()
-         	.body("content.nome", hasItem("ADÃO MARIN [ TESTE ]"))
-         	.body("content.nome", hasItems("Administrador Cda 1 Equideo Robot", "Administrador 1 Cda Vegetal Robot"))
+	}
 	
-			;
+	@Test
+	public void naoDevoIncluirContaComMesmoNome() { // Cenário para tentar incluir uma conta com  mesmo nome
+		
+		given()
+			.header("Authorization", "JWT " + token) // Envia o token que f0i extraído
+			.body("{\"nome\":\"Conta Alterada de novo\"}")  // Envia o nome da conta que será criada 
+		.when()
+			.post("/contas")                        // Rota para fazer o post 
+		.then()
+			.statusCode(400)                       //  Verifica que a resposta da requisição , conta criada com sucesso 201 Created
+			.body("error", is("Já existe uma conta com esse nome!")) // verifica a mensagem de erro que existe na chave "error"
+		;
+		
+	}
+	
+	@Test
+	public void inserindoMovimetacaoComSucesso() { // Cenário para incluir uma movimentação
+		Movimentacao mov = new Movimentacao();  // Montando um objeto de movimentação
+		mov.setConta_id(2381880);               // Enviando o ID da conta que será incluída a movimentação
+		//mov.setUsuario_id(usuraio_id);
+		mov.setDescricao("Movimentação Suspeita"); 
+		mov.setEnvolvido("Possoa teste");
+		mov.setTipo("REC");
+		mov.setData_transacao("01/02/2024");
+		mov.setData_pagamento("10/02/2025");
+		mov.setValor(1000f);
+		mov.setStatus(true);
+		
+		
+		
+		given()
+			.header("Authorization", "JWT " + token) // Envia o token que f0i extraído
+			.body(mov)  // Envia o nome da conta que será criada 
+		.when()
+			.post("/transacoes")                        // Rota para fazer o post 
+		.then()
+			.statusCode(201)                       //  Verifica que a resposta da requisição , conta criada com sucesso 201 Created
+			
+		;
+		
 	}
 	
 }
