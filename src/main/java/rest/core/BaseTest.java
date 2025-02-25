@@ -30,6 +30,9 @@ public class BaseTest implements Constantes {
 		
 		// Habilita o loog apenas se der erro no teste 
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+		
+		
+		
 				
 	}
 	

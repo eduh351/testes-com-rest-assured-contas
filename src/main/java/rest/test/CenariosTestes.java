@@ -49,7 +49,7 @@ public class CenariosTestes extends BaseTest{  // Classe Cenários foi extendida
 			
 		given()
 			.header("Authorization", "JWT " + token) // Envia o token que f0i extraído
-			.body("{\"nome\":\"Sétima Conta\"}")  // Envia o nome da conta que será criada 
+			.body("{\"nome\":\"Oitava Conta\"}")  // Envia o nome da conta que será criada 
 		.when()
 			.post("/contas")                        // Rota para fazer o post 
 		.then()

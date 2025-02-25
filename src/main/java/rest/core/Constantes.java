@@ -5,7 +5,7 @@ import io.restassured.http.ContentType;
 public interface Constantes {
 	
 	// Url  base dos testes 
-	String BASE_URL = "http://barrigarest.wcaquino.me";
+	String BASE_URL = "https://barrigarest.wcaquino.me/";
 	
 	// tipo de requisição que a API trabalha 
 
